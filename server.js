@@ -1,19 +1,12 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const OpenAI = require('openai');
 const path = require('path');
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname)));
-
-// Konfigurasi kembali ke OpenRouter
-const client = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY, // Pakai API Key OpenRouter kamu di Render
-});
 
 app.post('/api/chat', async (req, res) => {
   try {
@@ -23,26 +16,44 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'messages array is required' });
     }
 
-    // Memanggil OpenRouter dengan fitur reasoning diaktifkan
-    const apiResponse = await client.chat.completions.create({
-      model: 'arcee-ai/trinity-large-preview:free',
-      messages: messages,
-      reasoning: { enabled: true } // AKTIFKAN FITUR BERPIKIR
+    // Menggunakan fetch langsung ke OpenRouter sesuai permintaanmu
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "model": "arcee-ai/trinity-large-preview:free",
+        "messages": messages,
+        // Karena kamu bilang "gak mau reasoning", kita set false di sini
+        "reasoning": { "enabled": false } 
+      })
     });
 
-    const choice = apiResponse.choices[0];
-    const responseMessage = choice.message;
+    const result = await response.json();
 
-    // Kirim balik konten dan detail pemikirannya (reasoning_details) ke frontend
+    // Cek jika ada error dari OpenRouter (misal API Key salah atau kuota habis)
+    if (!response.ok) {
+      console.error('OpenRouter Error:', result);
+      return res.status(response.status).json({
+        error: 'OpenRouter API Error',
+        details: result.error?.message || 'Terjadi kesalahan pada server OpenRouter'
+      });
+    }
+
+    const aiMessage = result.choices[0].message;
+
+    // Kirim balik ke frontend
     res.json({
-      role: responseMessage.role,
-      content: responseMessage.content,
-      // OpenRouter mengirim reasoning dalam properti reasoning_details
-      reasoning_details: responseMessage.reasoning_details || null 
+      role: aiMessage.role,
+      content: aiMessage.content,
+      // Kita tetap kirim null untuk reasoning_details karena fitur dimatikan
+      reasoning_details: null 
     });
 
   } catch (error) {
-    console.error('OpenRouter Error:', error.message);
+    console.error('Server Error:', error.message);
     res.status(500).json({
       error: 'Failed to get response from AI',
       details: error.message,
@@ -52,5 +63,5 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🌸 Sensei Thinking Engine running on port ${PORT}`);
+  console.log(`🌸 Server Sakura Academy Aktif di Port ${PORT}`);
 });

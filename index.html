@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本語マスター - AI Belajar Bahasa Jepang</title>
+<meta name="description" content="Aplikasi AI interaktif untuk belajar Bahasa Jepang dengan tema anime imersif.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0c0e1a;
+  --bg-secondary:rgba(15,17,30,.85);
+  --bg-card:rgba(25,28,50,.75);
+  --bg-glass:rgba(255,255,255,.04);
+  --bg-input:rgba(20,22,40,.9);
+  --border-color:rgba(255,183,197,.12);
+  --border-active:rgba(255,145,175,.5);
+  --text-primary:#f0e6ef;
+  --text-secondary:rgba(220,200,220,.7);
+  --text-muted:rgba(180,160,180,.5);
+  --accent-sakura:#ffb7c5;
+  --accent-sky:#7ec8e3;
+  --accent-sunset:#f8a4b8;
+  --accent-gold:#ffd166;
+  --accent-lavender:#c4b5fd;
+  --accent-mint:#86efac;
+  --gradient-sakura:linear-gradient(135deg,#ffb7c5 0%,#ff6b9d 50%,#c850c0 100%);
+  --gradient-sky:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  --gradient-sunset:linear-gradient(135deg,#f093fb 0%,#f5576c 50%,#fda085 100%);
+  --gradient-night:linear-gradient(180deg,#0c0e1a 0%,#1a1033 30%,#2d1b4e 60%,#1a1033 100%);
+  --shadow-sakura:0 0 30px rgba(255,183,197,.15);
+  --shadow-glow:0 4px 30px rgba(255,107,157,.1);
+  --radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:24px;
+  --transition:all .3s cubic-bezier(.4,0,.2,1);
+  --font-main:'Zen Maru Gothic','Inter',sans-serif;
+  --font-jp:'Noto Sans JP','Zen Maru Gothic',sans-serif;
+  --sidebar-width:260px;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-main);background:var(--gradient-night);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6;position:relative}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(100,50,150,.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(255,107,157,.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(126,200,227,.08) 0%,transparent 50%);pointer-events:none;z-index:0}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+input,select,textarea{font-family:inherit;outline:none;border:none}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,183,197,.25);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent-sakura)}
+
+/* ===== SAKURA PARTICLES ===== */
+.sakura-container{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.sakura{position:absolute;width:12px;height:12px;background:radial-gradient(ellipse,rgba(255,183,197,.7),rgba(255,183,197,.1));border-radius:50% 0 50% 50%;animation:sakuraFall linear infinite;opacity:0}
+@keyframes sakuraFall{
+  0%{transform:translateY(-20px) rotate(0deg) scale(.8);opacity:0}
+  10%{opacity:.6}
+  90%{opacity:.4}
+  100%{transform:translateY(105vh) rotate(720deg) scale(.3);opacity:0}
+}
+
+/* ===== LAYOUT ===== */
+.sidebar{width:var(--sidebar-width);background:var(--bg-secondary);backdrop-filter:blur(20px) saturate(1.5);border-right:1px solid var(--border-color);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.main-content{flex:1;margin-left:var(--sidebar-width);display:flex;flex-direction:column;min-height:100vh;position:relative;z-index:1}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(12,14,26,.7);z-index:99;backdrop-filter:blur(6px)}
+
+/* ===== SIDEBAR ===== */
+.sidebar-header{padding:28px 20px 20px;text-align:center;position:relative}
+.sidebar-header::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,var(--accent-sakura),transparent)}
+.sidebar-logo{font-size:2.5rem;background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;font-family:var(--font-jp);filter:drop-shadow(0 0 10px rgba(255,183,197,.3));letter-spacing:2px}
+.sidebar-subtitle{font-size:.65rem;color:var(--accent-sakura);margin-top:6px;letter-spacing:4px;text-transform:uppercase;opacity:.7}
+.sidebar-nav{flex:1;padding:20px 12px;display:flex;flex-direction:column;gap:6px}
+.nav-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-md);color:var(--text-secondary);font-weight:500;font-size:.88rem;transition:var(--transition);position:relative;overflow:hidden;background:transparent}
+.nav-item::before{content:'';position:absolute;inset:0;background:var(--gradient-sakura);opacity:0;transition:opacity .3s ease;border-radius:var(--radius-md)}
+.nav-item:hover{color:var(--text-primary);transform:translateX(4px)}
+.nav-item:hover::before{opacity:.08}
+.nav-item.active{color:#fff;font-weight:700;text-shadow:0 0 20px rgba(255,183,197,.5)}
+.nav-item.active::before{opacity:.18}
+.nav-icon{font-size:1.4rem;width:28px;text-align:center;position:relative;z-index:1;transition:transform .3s ease}
+.nav-item:hover .nav-icon{transform:scale(1.2) rotate(-5deg)}
+.nav-label{white-space:nowrap;position:relative;z-index:1}
+.sidebar-footer{padding:16px 20px;text-align:center;position:relative}
+.sidebar-footer::before{content:'';position:absolute;top:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,183,197,.2),transparent)}
+.sidebar-footer p{font-size:.65rem;color:var(--text-muted);letter-spacing:1px}
+
+/* ===== TOP BAR (Mobile) ===== */
+.topbar{display:none;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg-secondary);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-color);position:sticky;top:0;z-index:90}
+.topbar-title{font-size:1.2rem;font-weight:700;background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:var(--font-jp)}
+.hamburger{background:rgba(255,183,197,.1);color:var(--accent-sakura);font-size:1.4rem;padding:8px 10px;border-radius:var(--radius-sm);transition:var(--transition)}
+.hamburger:hover{background:rgba(255,183,197,.2);transform:scale(1.1)}
+
+/* ===== PAGES ===== */
+.page{display:none;flex:1;flex-direction:column;height:100vh;animation:pageIn .5s cubic-bezier(.4,0,.2,1)}
+.page.active{display:flex}
+@keyframes pageIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== PAGE HEADER ===== */
+.page-header{padding:24px 32px;background:var(--bg-secondary);backdrop-filter:blur(20px);position:relative}
+.page-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent-sakura),rgba(126,200,227,.5),transparent)}
+.page-header h1{font-size:1.4rem;font-weight:700;display:flex;align-items:center;gap:10px;font-family:var(--font-jp)}
+.page-header p{font-size:.82rem;color:var(--text-secondary);margin-top:4px}
+
+/* ===== SENSEI CHAT ===== */
+.chat-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px}
+.chat-welcome{text-align:center;padding:60px 20px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.chat-welcome .welcome-icon{font-size:4rem;animation:floatBounce 3s ease-in-out infinite}
+@keyframes floatBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.chat-welcome h2{font-size:1.5rem;font-weight:700;background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:var(--font-jp)}
+.chat-welcome p{font-size:.88rem;color:var(--text-secondary);max-width:460px;line-height:1.7}
+.msg{max-width:78%;padding:16px 20px;border-radius:var(--radius-lg);font-size:.88rem;line-height:1.7;word-wrap:break-word;animation:msgPop .4s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes msgPop{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.msg.user{align-self:flex-end;background:var(--gradient-sakura);color:#fff;border-bottom-right-radius:4px;box-shadow:0 4px 20px rgba(255,107,157,.25)}
+.msg.assistant{align-self:flex-start;background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--border-color);border-bottom-left-radius:4px;box-shadow:var(--shadow-glow)}
+.msg-reasoning{margin-top:12px;padding:12px;background:rgba(255,183,197,.06);border-left:3px solid var(--accent-sakura);border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:.78rem;color:var(--text-secondary);cursor:pointer}
+.msg-reasoning summary{font-weight:600;color:var(--accent-sakura);font-size:.75rem;letter-spacing:.5px}
+.msg-reasoning pre{white-space:pre-wrap;margin-top:8px;font-size:.75rem;max-height:200px;overflow-y:auto}
+.chat-input-area{padding:16px 32px 24px;background:var(--bg-secondary);backdrop-filter:blur(20px);position:relative}
+.chat-input-area::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-color),transparent)}
+.chat-input-row{display:flex;gap:12px;align-items:flex-end}
+.chat-input{flex:1;padding:14px 18px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-primary);font-size:.88rem;resize:none;min-height:48px;max-height:120px;transition:var(--transition);font-family:var(--font-jp)}
+.chat-input:focus{border-color:var(--accent-sakura);box-shadow:0 0 20px rgba(255,183,197,.12)}
+.chat-input::placeholder{color:var(--text-muted)}
+.btn-send{padding:14px 24px;background:var(--gradient-sakura);color:#fff;font-weight:700;font-size:.85rem;border-radius:var(--radius-md);transition:var(--transition);white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(255,107,157,.25);letter-spacing:.5px}
+.btn-send:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 25px rgba(255,107,157,.35)}
+.btn-send:active{transform:scale(.97)}
+.btn-send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ===== MINNA NO NIHONGO ===== */
+.minna-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.minna-toolbar{padding:16px 32px;background:var(--bg-secondary);backdrop-filter:blur(20px);display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:relative}
+.minna-toolbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-color),transparent)}
+.select-styled{padding:10px 16px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-md);color:var(--text-primary);font-size:.85rem;transition:var(--transition);min-width:200px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffb7c5' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.select-styled:focus{border-color:var(--accent-sakura);box-shadow:0 0 15px rgba(255,183,197,.1)}
+.btn-primary{padding:10px 20px;background:var(--gradient-sakura);color:#fff;font-weight:700;font-size:.85rem;border-radius:var(--radius-md);transition:var(--transition);display:flex;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(255,107,157,.2);letter-spacing:.3px}
+.btn-primary:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 6px 25px rgba(255,107,157,.3)}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.minna-content{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px}
+.minna-welcome{text-align:center;padding:60px 20px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.minna-welcome .welcome-icon{font-size:4rem;animation:floatBounce 3s ease-in-out infinite}
+.minna-welcome h2{font-size:1.4rem;font-weight:700;background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:var(--font-jp)}
+.minna-welcome p{font-size:.88rem;color:var(--text-secondary);max-width:460px}
+.minna-msg{padding:20px;border-radius:var(--radius-lg);font-size:.88rem;line-height:1.8;animation:msgPop .4s cubic-bezier(.175,.885,.32,1.275);word-wrap:break-word}
+.minna-msg.assistant{background:var(--bg-card);backdrop-filter:blur(10px);border:1px solid var(--border-color)}
+.minna-msg.assistant .msg-content{font-family:var(--font-jp)}
+.minna-msg.user{background:var(--gradient-sakura);color:#fff;align-self:flex-end;max-width:80%;border-bottom-right-radius:4px;box-shadow:0 4px 20px rgba(255,107,157,.25)}
+.minna-practice{padding:16px 32px 24px;background:var(--bg-secondary);backdrop-filter:blur(20px);position:relative}
+.minna-practice::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-color),transparent)}
+.minna-practice-label{font-size:.75rem;color:var(--accent-sakura);margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.minna-practice-row{display:flex;gap:12px;align-items:flex-end}
+
+/* ===== FLASHCARD ===== */
+.flash-container{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.flash-toolbar{padding:16px 32px;background:var(--bg-secondary);backdrop-filter:blur(20px);display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:relative}
+.flash-toolbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-color),transparent)}
+.flash-info{margin-left:auto;font-size:.8rem;color:var(--text-secondary);display:flex;align-items:center;gap:8px}
+.flash-info .badge{background:var(--gradient-sakura);color:#fff;padding:3px 12px;border-radius:20px;font-weight:700;font-size:.75rem;box-shadow:0 2px 10px rgba(255,107,157,.3)}
+.flash-content{flex:1;overflow-y:auto;padding:24px 32px}
+.flash-welcome{text-align:center;padding:60px 20px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.flash-welcome .welcome-icon{font-size:4rem;animation:floatBounce 3s ease-in-out infinite}
+.flash-welcome h2{font-size:1.4rem;font-weight:700;background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-family:var(--font-jp)}
+.flash-welcome p{font-size:.88rem;color:var(--text-secondary);max-width:460px}
+.flash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.kanji-card{background:var(--bg-card);backdrop-filter:blur(12px);border:1px solid var(--border-color);border-radius:var(--radius-xl);padding:24px 20px;transition:var(--transition);animation:cardFlipIn .6s cubic-bezier(.175,.885,.32,1.275) both;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.kanji-card::before{content:'';position:absolute;top:-50%;right:-50%;width:100%;height:100%;background:radial-gradient(circle,rgba(255,183,197,.06) 0%,transparent 70%);pointer-events:none}
+.kanji-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gradient-sakura);opacity:.4;border-radius:0 0 var(--radius-xl) var(--radius-xl)}
+@keyframes cardFlipIn{from{opacity:0;transform:perspective(800px) rotateY(40deg) scale(.85)}to{opacity:1;transform:perspective(800px) rotateY(0) scale(1)}}
+.kanji-card:hover{border-color:var(--accent-sakura);box-shadow:var(--shadow-sakura),0 8px 30px rgba(0,0,0,.3);transform:translateY(-5px) scale(1.02)}
+.kanji-char{font-size:3.5rem;font-weight:900;text-align:center;font-family:var(--font-jp);background:var(--gradient-sakura);-webkit-background-clip:text;-webkit-text-fill-color:transparent;padding:8px 0;filter:drop-shadow(0 0 8px rgba(255,183,197,.3));transition:transform .3s ease}
+.kanji-card:hover .kanji-char{transform:scale(1.08)}
+.kanji-romaji{text-align:center;font-size:.92rem;font-weight:600;color:var(--accent-sakura)}
+.kanji-detail{display:flex;flex-direction:column;gap:8px;font-size:.8rem;color:var(--text-secondary)}
+.kanji-detail .label{font-weight:700;color:var(--accent-sakura);text-transform:uppercase;font-size:.65rem;letter-spacing:1.5px;opacity:.7}
+.kanji-detail .value{color:var(--text-primary);font-family:var(--font-jp)}
+.kanji-meaning{text-align:center;padding:10px 14px;background:rgba(255,183,197,.08);border:1px solid rgba(255,183,197,.1);border-radius:var(--radius-sm);font-weight:700;color:var(--accent-sakura);font-size:.85rem}
+.kanji-example{font-size:.78rem;color:var(--text-secondary);padding:10px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:var(--radius-sm);font-family:var(--font-jp);line-height:1.7}
+
+/* ===== LOADING ===== */
+.loading-dots{display:flex;align-items:center;justify-content:center;gap:6px;padding:20px}
+.loading-dots span{width:10px;height:10px;background:var(--gradient-sakura);border-radius:50%;animation:loadPulse 1.4s ease infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes loadPulse{0%,80%,100%{transform:scale(0);opacity:.3}40%{transform:scale(1);opacity:1}}
+.loading-card{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:16px}
+.loading-card p{color:var(--text-secondary);font-size:.88rem}
+
+/* ===== BTN DANGER ===== */
+.btn-danger{padding:8px 16px;background:rgba(248,164,184,.1);border:1px solid rgba(248,164,184,.2);color:var(--accent-sunset);font-weight:600;font-size:.8rem;border-radius:var(--radius-md);transition:var(--transition)}
+.btn-danger:hover{background:rgba(248,164,184,.2);transform:translateY(-1px)}
+
+/* ===== MARKDOWN STYLES ===== */
+.msg-content h1,.msg-content h2,.msg-content h3,.msg-content h4{color:var(--accent-sakura);margin:12px 0 6px;font-family:var(--font-jp)}
+.msg-content h2{font-size:1.1rem;border-bottom:1px solid var(--border-color);padding-bottom:6px}
+.msg-content h3{font-size:1rem}
+.msg-content table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem;border-radius:var(--radius-sm);overflow:hidden}
+.msg-content th,.msg-content td{border:1px solid var(--border-color);padding:8px 12px;text-align:left}
+.msg-content th{background:rgba(255,183,197,.08);font-weight:600;color:var(--accent-sakura)}
+.msg-content td{background:rgba(255,255,255,.02)}
+.msg-content p{margin-bottom:8px}
+.msg-content strong{color:var(--accent-sakura)}
+.msg-content em{color:var(--accent-sky)}
+.msg-content ul,.msg-content ol{padding-left:20px;margin-bottom:12px}
+.msg-content li{margin-bottom:4px}
+.msg-content code{background:rgba(255,183,197,.08);color:var(--accent-sakura);padding:2px 6px;border-radius:4px;font-size:.82rem}
+.msg-content pre{background:var(--bg-input);border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:12px;overflow-x:auto;margin:8px 0}
+.msg-content pre code{background:none;padding:0}
+.msg-content hr{border:none;height:1px;background:linear-gradient(90deg,transparent,var(--accent-sakura),transparent);margin:16px 0}
+.msg-content blockquote{border-left:3px solid var(--accent-sakura);padding:8px 16px;margin:8px 0;background:rgba(255,183,197,.04);border-radius:0 var(--radius-sm) var(--radius-sm) 0;color:var(--text-secondary)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main-content{margin-left:0}
+  .topbar{display:flex}
+  .page-header{padding:16px}
+  .page-header h1{font-size:1.15rem}
+  .chat-messages{padding:16px}
+  .chat-input-area{padding:12px 16px 16px}
+  .msg{max-width:92%}
+  .minna-toolbar,.flash-toolbar{padding:12px 16px}
+  .minna-content,.flash-content{padding:16px}
+  .minna-practice{padding:12px 16px 16px}
+  .flash-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .chat-input-row,.minna-practice-row{flex-direction:column}
+  .btn-send,.minna-practice-row .btn-primary{width:100%;justify-content:center}
+  .minna-toolbar,.flash-toolbar{flex-direction:column;align-items:stretch}
+  .select-styled{min-width:unset}
+  .flash-info{margin-left:0;justify-content:center}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<!-- SAKURA PARTICLES (generated by JS) -->
+<div class="sakura-container" id="sakuraContainer"></div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">桜学院</div>
+    <div class="sidebar-subtitle">Sakura Academy</div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="sensei" onclick="switchPage('sensei')">
+      <span class="nav-icon">🌸</span>
+      <span class="nav-label">Sensei Chat</span>
+    </button>
+    <button class="nav-item" data-page="minna" onclick="switchPage('minna')">
+      <span class="nav-icon">📖</span>
+      <span class="nav-label">Minna no Nihongo</span>
+    </button>
+    <button class="nav-item" data-page="flashcard" onclick="switchPage('flashcard')">
+      <span class="nav-icon">🎴</span>
+      <span class="nav-label">Flashcard Kanji</span>
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <p>✨ Powered by AI ✨</p>
+  </div>
+</aside>
+
+<div class="topbar" id="topbar">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <div class="topbar-title">桜学院</div>
+  <div style="width:36px"></div>
+</div>
+
+<main class="main-content">
+
+  <section class="page active" id="page-sensei">
+    <div class="page-header">
+      <h1>🌸 Sensei Chat</h1>
+      <p>Tanya apa saja tentang Bahasa Jepang — Sensei AI siap membedah jawaban untukmu!</p>
+    </div>
+    <div class="chat-container">
+      <div class="chat-messages" id="senseiMessages">
+        <div class="chat-welcome">
+          <div class="welcome-icon">🌸</div>
+          <h2>こんにちは、先生です！</h2>
+          <p>Ketik pesan untuk mulai belajar. Kirim kata atau kalimat dalam Bahasa Jepang maupun Indonesia, dan Sensei akan membedahnya secara detail untukmu.</p>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="senseiInput" placeholder="Ketik pesan ke Sensei... ✨" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSensei()}"></textarea>
+          <button class="btn-send" id="senseiSendBtn" onclick="sendSensei()">Kirim ✈️</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-minna">
+    <div class="page-header">
+      <h1>📖 Minna no Nihongo</h1>
+      <p>Pilih bab, pelajari materi, dan latihan membuat kalimat.</p>
+    </div>
+    <div class="minna-container">
+      <div class="minna-toolbar">
+        <select class="select-styled" id="minnaChapter"><option value="">-- Pilih Bab --</option></select>
+        <button class="btn-primary" id="minnaLoadBtn" onclick="loadMinnaChapter()">📖 Muat Materi</button>
+      </div>
+      <div class="minna-content" id="minnaContent">
+        <div class="minna-welcome">
+          <div class="welcome-icon">📚</div>
+          <h2>みんなの日本語 1-50</h2>
+          <p>Pilih bab dari dropdown lalu klik "Muat Materi" untuk memulai. Setelah memuat materi, gunakan kolom latihan di bawah untuk berlatih membuat kalimat.</p>
+        </div>
+      </div>
+      <div class="minna-practice" id="minnaPractice" style="display:none">
+        <div class="minna-practice-label">✏️ Latihan Kalimat — Tulis kalimat menggunakan rumus bab ini</div>
+        <div class="minna-practice-row">
+          <textarea class="chat-input" id="minnaInput" placeholder="Tulis kalimat latihan... ✨" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMinnaPractice()}"></textarea>
+          <button class="btn-primary" id="minnaPracticeBtn" onclick="sendMinnaPractice()">Evaluasi ✅</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="page-flashcard">
+    <div class="page-header">
+      <h1>🎴 Flashcard Kanji</h1>
+      <p>Pelajari Kanji berdasarkan level JLPT — 20 karakter per sesi, tanpa pengulangan!</p>
+    </div>
+    <div class="flash-container">
+      <div class="flash-toolbar">
+        <select class="select-styled" id="flashLevel">
+          <option value="N5">JLPT N5</option><option value="N4">JLPT N4</option>
+          <option value="N3">JLPT N3</option><option value="N2">JLPT N2</option>
+          <option value="N1">JLPT N1</option>
+        </select>
+        <button class="btn-primary" id="flashStartBtn" onclick="startFlashSession()">🚀 Mulai Sesi</button>
+        <button class="btn-danger" onclick="resetFlashSession()">🔄 Reset</button>
+        <div class="flash-info">
+          <span>Dipelajari:</span>
+          <span class="badge" id="flashCount">0</span>
+        </div>
+      </div>
+      <div class="flash-content" id="flashContent">
+        <div class="flash-welcome">
+          <div class="welcome-icon">🎴</div>
+          <h2>漢字フラッシュカード</h2>
+          <p>Pilih level JLPT dan klik "Mulai Sesi" untuk mendapatkan 20 Kanji baru. Setiap sesi menampilkan Kanji yang belum pernah ditampilkan sebelumnya.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+/* ===== SAKURA PARTICLE GENERATOR ===== */
+(function(){
+  const c=document.getElementById('sakuraContainer');
+  const count=window.innerWidth<768?15:30;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='sakura';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(8+Math.random()*12)+'s';
+    p.style.animationDelay=(Math.random()*15)+'s';
+    p.style.width=(8+Math.random()*10)+'px';
+    p.style.height=p.style.width;
+    p.style.opacity=0;
+    c.appendChild(p);
+  }
+})();
+
+/* ===========================
+   STATE & CONFIG
+   =========================== */
+const senseiHistory = [];
+const minnaHistory = [];
+const flashHistory = [];
+const usedKanji = { N5: [], N4: [], N3: [], N2: [], N1: [] };
+let currentMinnaChapter = null;
+
+/* ===========================
+   SYSTEM PROMPTS
+   =========================== */
+const SENSEI_SYSTEM = `Kamu adalah Guru Bahasa Jepang profesional bernama Sensei AI.
+ATURAN WAJIB:
+1. Selalu balas dengan huruf Jepang (Hiragana/Katakana/Kanji) + Romaji + Arti Bahasa Indonesia.
+2. Jika user mengirim sebuah KALIMAT (bukan hanya satu kata), WAJIB bedah menjadi:
+   a. **Kosakata** — daftar setiap kata dalam kalimat beserta arti dan kelasnya (kata benda, kata kerja, partikel, dll).
+   b. **Cara Penulisan** — tulis kalimat dalam Hiragana, Katakana (jika berlaku), dan Romaji.
+   c. **Bedah Kalimat** — jelaskan struktur gramatikal kalimat (subjek, objek, predikat, partikel, dll).
+   d. **Contoh Kalimat** — berikan 2-3 contoh kalimat lain yang mirip strukturnya.
+   e. **Pola Tata Bahasa** — jelaskan pola grammar yang digunakan dalam kalimat tersebut.
+3. Jika user mengirim satu KATA, berikan: penulisan Jepang, Romaji, arti, Onyomi, Kunyomi (jika Kanji), kelas kata, dan 2-3 contoh kalimat.
+4. Jawab SELALU dalam Bahasa Indonesia kecuali bagian Jepang.
+5. Gunakan format yang rapi dan mudah dibaca.`;
+
+function getMinnaSystem(chapter) {
+  return `Kamu adalah Guru Bahasa Jepang yang mengajar buku Minna no Nihongo.
+Sekarang kamu sedang mengajar BAB ${chapter}.
+TUGAS:
+1. Generate MATERI LENGKAP bab ${chapter} Minna no Nihongo, meliputi:
+   - Judul Bab dan Topik Utama
+   - Kosakata Utama (dalam Jepang + Romaji + Arti Indonesia)
+   - Pola Kalimat / Tata Bahasa utama bab ini dengan penjelasan detail
+   - Contoh Kalimat untuk setiap pola
+   - Catatan Budaya atau Tips (jika ada)
+2. Format harus rapi, terstruktur, dan mudah dipahami.
+3. Gunakan Bahasa Indonesia untuk penjelasan.
+4. Sertakan huruf Jepang (Hiragana/Katakana/Kanji) + Romaji di setiap contoh.`;
+}
+
+function getMinnaPracticeSystem(chapter) {
+  return `Kamu adalah Guru Bahasa Jepang penguji untuk Minna no Nihongo Bab ${chapter}.
+TUGAS:
+1. User akan mengirimkan kalimat latihan Bahasa Jepang.
+2. Evaluasi kalimat tersebut:
+   - Apakah sesuai dengan pola/rumus tata bahasa Bab ${chapter}?
+   - Apakah kosakata dan partikel sudah benar?
+   - Apakah urutan kata sudah tepat?
+3. Jika BENAR: beri pujian, lalu jelaskan struktur kalimatnya.
+4. Jika SALAH: koreksi dengan penjelasan detail apa yang salah dan berikan versi yang benar.
+5. Selalu berikan 1-2 saran kalimat alternatif.
+6. Jawab dalam Bahasa Indonesia, sertakan Jepang + Romaji.`;
+}
+
+function getFlashSystem(level, usedList) {
+  const usedStr = usedList.length > 0 ? usedList.join(', ') : '(belum ada)';
+  return `Kamu adalah generator Kanji JLPT.
+TUGAS: Berikan TEPAT 20 Kanji level ${level} selanjutnya sesuai urutan standar JLPT.
+
+DILARANG KERAS menampilkan Kanji berikut yang sudah dipelajari: [${usedStr}]
+
+FORMAT OUTPUT WAJIB untuk SETIAP Kanji (tulis persis seperti ini, 20 kali):
+===KANJI_START===
+Kanji: [karakter kanji]
+Romaji: [cara baca umum dalam romaji]
+Onyomi: [bacaan on'yomi dalam katakana + romaji]
+Kunyomi: [bacaan kun'yomi dalam hiragana + romaji]
+Arti: [arti dalam Bahasa Indonesia]
+Contoh: [contoh kalimat Jepang] ([romaji]) - [arti Indonesia]
+===KANJI_END===
+
+PENTING: Pastikan TEPAT 20 Kanji. Jangan kurang, jangan lebih. Jangan ulangi Kanji yang sudah ada di daftar larangan.`;
+}
+
+/* ===========================
+   NAVIGATION
+   =========================== */
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  if (window.innerWidth <= 768) toggleSidebar(false);
+}
+
+function toggleSidebar(forceState) {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  const isOpen = typeof forceState === 'boolean' ? forceState : !sb.classList.contains('open');
+  sb.classList.toggle('open', isOpen);
+  ov.classList.toggle('open', isOpen);
+}
+
+/* ===========================
+   API CALL
+   =========================== */
+async function callAPI(messages) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.details || 'API request failed');
+  }
+  return res.json();
+}
+
+/* ===========================
+   SENSEI CHAT
+   =========================== */
+async function sendSensei() {
+  const input = document.getElementById('senseiInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const container = document.getElementById('senseiMessages');
+  const sendBtn = document.getElementById('senseiSendBtn');
+  const welcome = container.querySelector('.chat-welcome');
+  if (welcome) welcome.remove();
+  appendMsg(container, 'user', text);
+  input.value = '';
+  input.style.height = 'auto';
+  if (senseiHistory.length === 0) {
+    senseiHistory.push({ role: 'system', content: SENSEI_SYSTEM });
+  }
+  senseiHistory.push({ role: 'user', content: text });
+  const loadingEl = showLoading(container);
+  sendBtn.disabled = true;
+  try {
+    const data = await callAPI(senseiHistory);
+    senseiHistory.push({ role: 'assistant', content: data.content });
+    loadingEl.remove();
+    appendMsg(container, 'assistant', data.content, data.reasoning_details);
+  } catch (e) {
+    loadingEl.remove();
+    appendMsg(container, 'assistant', '⚠️ Error: ' + e.message);
+    senseiHistory.pop();
+  }
+  sendBtn.disabled = false;
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ===========================
+   MINNA NO NIHONGO
+   =========================== */
+function populateMinnaDropdown() {
+  const sel = document.getElementById('minnaChapter');
+  for (let i = 1; i <= 50; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `Bab ${i}`;
+    sel.appendChild(opt);
+  }
+}
+
+async function loadMinnaChapter() {
+  const sel = document.getElementById('minnaChapter');
+  const chapter = sel.value;
+  if (!chapter) return alert('Pilih bab terlebih dahulu!');
+  currentMinnaChapter = chapter;
+  const container = document.getElementById('minnaContent');
+  const loadBtn = document.getElementById('minnaLoadBtn');
+  const practice = document.getElementById('minnaPractice');
+  container.innerHTML = '';
+  practice.style.display = 'none';
+  minnaHistory.length = 0;
+  minnaHistory.push({ role: 'system', content: getMinnaSystem(chapter) });
+  minnaHistory.push({ role: 'user', content: `Tolong ajarkan materi lengkap Bab ${chapter} Minna no Nihongo.` });
+  const loadingEl = showLoading(container);
+  loadBtn.disabled = true;
+  try {
+    const data = await callAPI(minnaHistory);
+    minnaHistory.push({ role: 'assistant', content: data.content });
+    loadingEl.remove();
+    addMinnaMsg(container, 'assistant', data.content, data.reasoning_details);
+    practice.style.display = 'block';
+  } catch (e) {
+    loadingEl.remove();
+    addMinnaMsg(container, 'assistant', '⚠️ Error: ' + e.message);
+    minnaHistory.pop();
+  }
+  loadBtn.disabled = false;
+}
+
+async function sendMinnaPractice() {
+  const input = document.getElementById('minnaInput');
+  const text = input.value.trim();
+  if (!text || !currentMinnaChapter) return;
+  const container = document.getElementById('minnaContent');
+  const practiceBtn = document.getElementById('minnaPracticeBtn');
+  addMinnaMsg(container, 'user', text);
+  input.value = '';
+  if (minnaHistory.length > 0 && minnaHistory[0].role === 'system') {
+    minnaHistory.push({ role: 'user', content: `[LATIHAN KALIMAT] Evaluasi kalimat berikut berdasarkan pola Bab ${currentMinnaChapter}: "${text}"` });
+  }
+  const loadingEl = showLoading(container);
+  practiceBtn.disabled = true;
+  try {
+    const data = await callAPI(minnaHistory);
+    minnaHistory.push({ role: 'assistant', content: data.content });
+    loadingEl.remove();
+    addMinnaMsg(container, 'assistant', data.content, data.reasoning_details);
+  } catch (e) {
+    loadingEl.remove();
+    addMinnaMsg(container, 'assistant', '⚠️ Error: ' + e.message);
+    minnaHistory.pop();
+  }
+  practiceBtn.disabled = false;
+  container.scrollTop = container.scrollHeight;
+}
+
+/* ===========================
+   FLASHCARD KANJI
+   =========================== */
+async function startFlashSession() {
+  const level = document.getElementById('flashLevel').value;
+  const container = document.getElementById('flashContent');
+  const startBtn = document.getElementById('flashStartBtn');
+  container.innerHTML = '';
+  const loadingEl = document.createElement('div');
+  loadingEl.className = 'loading-card';
+  loadingEl.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div><p>Sedang men-generate 20 Kanji ${level}... 🌸</p>`;
+  container.appendChild(loadingEl);
+  startBtn.disabled = true;
+  const sysPrompt = getFlashSystem(level, usedKanji[level]);
+  const messages = [
+    { role: 'system', content: sysPrompt },
+    { role: 'user', content: `Berikan 20 Kanji level ${level} berikutnya. Yang sudah dipelajari: ${usedKanji[level].length} karakter.` }
+  ];
+  try {
+    const data = await callAPI(messages);
+    loadingEl.remove();
+    const cards = parseKanjiCards(data.content);
+    if (cards.length === 0) {
+      container.innerHTML = '<div class="flash-welcome"><p>⚠️ Gagal memproses Kanji. Coba lagi.</p></div>';
+    } else {
+      renderKanjiCards(container, cards);
+      cards.forEach(c => {
+        if (c.kanji && !usedKanji[level].includes(c.kanji)) usedKanji[level].push(c.kanji);
+      });
+      updateFlashCount(level);
+    }
+  } catch (e) {
+    loadingEl.remove();
+    container.innerHTML = `<div class="flash-welcome"><p>⚠️ Error: ${e.message}</p></div>`;
+  }
+  startBtn.disabled = false;
+}
+
+function resetFlashSession() {
+  const level = document.getElementById('flashLevel').value;
+  usedKanji[level] = [];
+  updateFlashCount(level);
+  document.getElementById('flashContent').innerHTML = `<div class="flash-welcome"><div class="welcome-icon">🎴</div><h2>Sesi ${level} Direset!</h2><p>Semua data Kanji ${level} yang sudah dipelajari telah dihapus. Klik "Mulai Sesi" untuk memulai dari awal.</p></div>`;
+}
+
+function updateFlashCount(level) {
+  document.getElementById('flashCount').textContent = usedKanji[level].length;
+}
+
+document.getElementById('flashLevel').addEventListener('change', function () {
+  updateFlashCount(this.value);
+});
+
+function parseKanjiCards(text) {
+  const cards = [];
+  const blocks = text.split('===KANJI_START===').filter(b => b.includes('===KANJI_END==='));
+  for (const block of blocks) {
+    const content = block.split('===KANJI_END===')[0].trim();
+    const card = {};
+    const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+    for (const line of lines) {
+      const match = line.match(/^(Kanji|Romaji|Onyomi|Kunyomi|Arti|Contoh):\s*(.+)/i);
+      if (match) { card[match[1].toLowerCase()] = match[2].trim(); }
+    }
+    if (card.kanji) cards.push(card);
+  }
+  return cards;
+}
+
+function renderKanjiCards(container, cards) {
+  const grid = document.createElement('div');
+  grid.className = 'flash-grid';
+  cards.forEach((card, i) => {
+    const el = document.createElement('div');
+    el.className = 'kanji-card';
+    el.style.animationDelay = `${i * 0.07}s`;
+    el.innerHTML = `
+      <div class="kanji-char">${card.kanji || '?'}</div>
+      <div class="kanji-romaji">${card.romaji || ''}</div>
+      <div class="kanji-meaning">${card.arti || ''}</div>
+      <div class="kanji-detail">
+        <div><span class="label">音読み Onyomi</span><div class="value">${card.onyomi || '-'}</div></div>
+        <div><span class="label">訓読み Kunyomi</span><div class="value">${card.kunyomi || '-'}</div></div>
+      </div>
+      <div class="kanji-example">${card.contoh || ''}</div>`;
+    grid.appendChild(el);
+  });
+  container.appendChild(grid);
+}
+
+/* ===========================
+   UI HELPERS
+   =========================== */
+function appendMsg(container, role, text, reasoning) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  if (role === 'assistant') {
+    let html = `<div class="msg-content">${marked.parse(text)}</div>`;
+    if (reasoning) {
+      html += `<details class="msg-reasoning"><summary>💭 Reasoning Details</summary><pre>${escapeHtml(reasoning)}</pre></details>`;
+    }
+    div.innerHTML = html;
+  } else {
+    div.textContent = text;
+  }
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function addMinnaMsg(container, role, text, reasoning) {
+  const div = document.createElement('div');
+  div.className = `minna-msg ${role}`;
+  if (role === 'assistant') {
+    let html = `<div class="msg-content">${marked.parse(text)}</div>`;
+    if (reasoning) {
+      html += `<details class="msg-reasoning"><summary>💭 Reasoning Details</summary><pre>${escapeHtml(reasoning)}</pre></details>`;
+    }
+    div.innerHTML = html;
+  } else {
+    div.textContent = text;
+  }
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showLoading(container) {
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+document.querySelectorAll('.chat-input').forEach(ta => {
+  ta.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+});
+
+/* ===========================
+   INIT
+   =========================== */
+populateMinnaDropdown();
+updateFlashCount('N5');
+</script>
+</body>
+</html>

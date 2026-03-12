@@ -10,7 +10,7 @@ app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname)));
 
 const client = new OpenAI({
-  baseURL: 'https://free.v36.cm',
+  baseURL: 'https://free.v36.cm/v1',
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 

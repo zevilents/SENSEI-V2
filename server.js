@@ -45,7 +45,7 @@ app.post('/api/chat', async (req, res) => {
 
     // 2. Tembak langsung ke API asli Gemini (Persis seperti format CURL kamu!)
     const apiKey = process.env.OPENROUTER_API_KEY; // Tetap pakai variabel ini di Render agar praktis
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
     // Gunakan fungsi fetch bawaan tanpa library pihak ketiga
     const response = await fetch(url, {

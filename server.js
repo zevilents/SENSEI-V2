@@ -24,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "gpt-4o-mini",
+        "model": "gpt-3.5-turbo",
         "messages": messages,
         // Karena kamu bilang "gak mau reasoning", kita set false di sini
         "reasoning": { "enabled": false } 

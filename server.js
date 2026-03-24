@@ -17,14 +17,14 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Menggunakan fetch langsung ke OpenRouter sesuai permintaanmu
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://free.v36.cm/v1/", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+        "model": "gpt-4o-mini",
         "messages": messages,
         // Karena kamu bilang "gak mau reasoning", kita set false di sini
         "reasoning": { "enabled": false } 

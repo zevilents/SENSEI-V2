@@ -24,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "nvidia/nemotron-3-super-120b-a12b:free",
+        "model": "stepfun/step-3.5-flash:free",
         "messages": messages,
         // Karena kamu bilang "gak mau reasoning", kita set false di sini
         "reasoning": { "enabled": false } 
